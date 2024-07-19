@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const fromCurrency = document.getElementById('fromCurrency');
     const toCurrency = document.getElementById('toCurrency');
     const amount = document.getElementById('amount');
@@ -15,15 +15,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('rates.json');
             const data = await response.json();
             rates = data.rates;
-            populateCurrencyOptions();
-            initializeRateChart();
+            await populateCurrencyOptions();
+            await initializeRateChart();
         } catch (error) {
             console.error('Error fetching rates:', error);
         }
     }
 
     // Función para llenar las opciones de las monedas
-    function populateCurrencyOptions() {
+    async function populateCurrencyOptions() {
         const currencyOptions = Object.keys(rates);
         currencyOptions.forEach(currency => {
             const option1 = document.createElement('option');
@@ -43,18 +43,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const to = toCurrency.value;
         const amountValue = parseFloat(amount.value);
 
-        if (isNaN(amountValue) || !from || !to) {
+        if (isNaN(amountValue) ||!from ||!to) {
             conversionResult.textContent = 'Por favor, ingrese una cantidad válida y seleccione las monedas.';
             return;
         }
 
-        const rate = rates[to] / rates[from];
-        const result = amountValue * rate;
+        const usdAmount = amountValue / rates[from];
+        const result = usdAmount * rates[to];
         conversionResult.textContent = `Resultado: ${result.toFixed(2)} ${to}`;
     }
-    
+
     // Función para inicializar el gráfico de tasas de cambio
-    function initializeRateChart() {
+    async function initializeRateChart() {
         chart = new Chart(rateChart, {
             type: 'bar',
             data: {
@@ -80,7 +80,5 @@ document.addEventListener('DOMContentLoaded', () => {
     convertButton.addEventListener('click', convertCurrency);
 
     // Cargar las tasas de cambio al cargar la página
-    fetchRates();
+    await fetchRates();
 });
-
-
