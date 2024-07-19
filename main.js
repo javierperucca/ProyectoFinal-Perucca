@@ -48,6 +48,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
+        if (!['ARS', 'EUR', 'USD', 'JPY'].includes(from) ||!['ARS', 'EUR', 'USD', 'JPY'].includes(to)) {
+            conversionResult.textContent = 'Solo se permiten conversiones entre ARS, EUR, USD y JPY.';
+            return;
+        }
+
         const usdAmount = amountValue / rates[from];
         const result = usdAmount * rates[to];
         conversionResult.textContent = `Resultado: ${result.toFixed(2)} ${to}`;
