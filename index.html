@@ -3,6 +3,16 @@
 <head>
     <title>Conversor de Moneda</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
 </head>
 <body>
     <h1>Conversor de Moneda</h1>
@@ -16,6 +26,7 @@
         <button id="convertButton">Convertir</button>
         <p id="conversionResult"></p>
     </form>
+
     <div>
         <canvas id="exchangeRatesChart"></canvas>
     </div>
@@ -101,9 +112,13 @@
                     return;
                 }
 
-                const usdAmount = amountValue / rates[from];
-                const result = usdAmount * rates[to];
-                conversionResult.textContent = `Resultado: ${result.toFixed(2)} ${to}`;
+                if (from === to) {
+                    conversionResult.textContent = `Resultado: ${amountValue} ${to}`;
+                } else {
+                    const usdAmount = amountValue / rates[from];
+                    const result = usdAmount * rates[to];
+                    conversionResult.textContent = `Resultado: ${result.toFixed(2)} ${to}`;
+                }
             }
 
             populateCurrencyOptions();
