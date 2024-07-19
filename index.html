@@ -1,30 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Conversor de Moneda</title>
+    <title>Simulador de Conversión de Monedas</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        table {
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-    </style>
 </head>
 <body>
-    <h1>Conversor de Moneda</h1>
+    <h1>Simulador de Conversión de Monedas</h1>
+    <h2>Conversión de Monedas</h2>
     <form>
         <label for="fromCurrency">De:</label>
-        <select id="fromCurrency"></select>
+        <select id="fromCurrency">
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="ARS">ARS</option>
+            <option value="JPY">JPY</option>
+        </select>
         <label for="toCurrency">A:</label>
-        <select id="toCurrency"></select>
+        <select id="toCurrency">
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="ARS">ARS</option>
+            <option value="JPY">JPY</option>
+        </select>
         <label for="amount">Cantidad:</label>
         <input type="number" id="amount" value="1">
         <button id="convertButton">Convertir</button>
-        <p id="conversionResult"></p>
+        <p id="conversionResult">Resultado: 1.18 USD</p>
     </form>
 
     <div>
@@ -32,99 +33,45 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const fromCurrency = document.getElementById('fromCurrency');
-            const toCurrency = document.getElementById('toCurrency');
-            const amount = document.getElementById('amount');
-            const convertButton = document.getElementById('convertButton');
-            const conversionResult = document.getElementById('conversionResult');
-            const exchangeRatesChart = document.getElementById('exchangeRatesChart');
+        const rates = {
+            "ARS": 0.018,
+            "EUR": 0.85,
+            "USD": 1.0,
+            "JPY": 110.0
+        };
 
-            let rates = {
-                "ARS": 0.018,
-                "EUR": 0.85,
-                "USD": 1.0,
-                "JPY": 110.0
-            };
-
-            // Limpiar opciones de moneda
-            fromCurrency.innerHTML = '';
-            toCurrency.innerHTML = '';
-
-            // Función para llenar las opciones de las monedas
-            function populateCurrencyOptions() {
-                const currencies = ['ARS', 'EUR', 'USD', 'JPY'];
-                currencies.forEach(currency => {
-                    const option1 = document.createElement('option');
-                    option1.value = currency;
-                    option1.textContent = currency;
-
-                    const option2 = option1.cloneNode(true);
-
-                    fromCurrency.appendChild(option1);
-                    toCurrency.appendChild(option2);
-                });
-            }
-
-            // Función para mostrar las tasas de cambio
-            function showExchangeRates() {
-                const ctx = exchangeRatesChart.getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: Object.keys(rates),
-                        datasets: [{
-                            label: 'Tasas de cambio',
-                            data: Object.values(rates),
-                            backgroundColor: [
-                                'rgba(255, 99, 132, 0.2)',
-                                'rgba(54, 162, 235, 0.2)',
-                                'rgba(255, 206, 86, 0.2)',
-                                'rgba(75, 192, 192, 0.2)'
-                            ],
-                            borderColor: [
-                                'rgba(255, 99, 132, 1)',
-                                'rgba(54, 162, 235, 1)',
-                                'rgba(255, 206, 86, 1)',
-                                'rgba(75, 192, 192, 1)'
-                            ],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
+        const ctx = document.getElementById('exchangeRatesChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(rates),
+                datasets: [{
+                    label: 'Tasas de cambio',
+                    data: Object.values(rates),
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 1.0,
+                        min: 0.5
                     }
-                });
-            }
-
-            // Función para convertir la moneda
-            function convertCurrency() {
-                const from = fromCurrency.value;
-                const to = toCurrency.value;
-                const amountValue = parseFloat(amount.value);
-
-                if (isNaN(amountValue) || !from || !to) {
-                    conversionResult.textContent = 'Por favor, ingrese una cantidad válida y seleccione las monedas.';
-                    return;
-                }
-
-                if (from === to) {
-                    conversionResult.textContent = `Resultado: ${amountValue} ${to}`;
-                } else {
-                    const usdAmount = amountValue / rates[from];
-                    const result = usdAmount * rates[to];
-                    conversionResult.textContent = `Resultado: ${result.toFixed(2)} ${to}`;
                 }
             }
-
-            populateCurrencyOptions();
-            showExchangeRates();
-
-            convertButton.addEventListener('click', convertCurrency);
         });
     </script>
 </body>
