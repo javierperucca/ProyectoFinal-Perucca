@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const amount = document.getElementById('amount');
     const convertButton = document.getElementById('convertButton');
     const conversionResult = document.getElementById('conversionResult');
+    const exchangeRates = document.getElementById('exchangeRates');
 
     let rates = {
         "ARS": 0.018,
@@ -31,13 +32,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // Función para mostrar las tasas de cambio
+    function showExchangeRates() {
+        let html = '<table>';
+        html += '<tr><th>Moneda</th><th>Tasa de cambio</th></tr>';
+        Object.keys(rates).forEach(currency => {
+            html += `<tr><td>${currency}</td><td>${rates[currency].toFixed(2)}</td></tr>`;
+        });
+        html += '</table>';
+        exchangeRates.innerHTML = html;
+    }
+
     // Función para convertir la moneda
     function convertCurrency() {
         const from = fromCurrency.value;
         const to = toCurrency.value;
         const amountValue = parseFloat(amount.value);
 
-        if (isNaN(amountValue) || !from || !to) {
+        if (isNaN(amountValue) ||!from ||!to) {
             conversionResult.textContent = 'Por favor, ingrese una cantidad válida y seleccione las monedas.';
             return;
         }
@@ -48,6 +60,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     populateCurrencyOptions();
+    showExchangeRates();
 
     convertButton.addEventListener('click', convertCurrency);
 });
