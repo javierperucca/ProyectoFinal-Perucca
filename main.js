@@ -4,23 +4,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     const amount = document.getElementById('amount');
     const convertButton = document.getElementById('convertButton');
     const conversionResult = document.getElementById('conversionResult');
-    const exchangeRates = document.getElementById('exchangeRates');
+    const rateChart = document.getElementById('rateChart').getContext('2d');
 
-    let rates = {
-        "ARS": 0.018,
-        "EUR": 0.85,
-        "USD": 1.0,
-        "JPY": 110.0
-    };
+    let rates = {};
+    let chart;
 
-    // Limpiar opciones de moneda
-    fromCurrency.innerHTML = '';
-    toCurrency.innerHTML = '';
+    // Tasas de cambio solo para USD, EUR, JPY
+    const allowedCurrencies = ['USD', 'EUR', 'JPY'];
+
+    // Función para obtener tasas de cambio desde un JSON local o una API externa
+    async function fetchRates() {
+        try {
+            const response = await fetch('rates.json');
+            const data = await response.json();
+            // Filtrar solo las tasas permitidas
+            Object.keys(data.rates)
+                  .filter(currency => allowedCurrencies.includes(currency))
+                  .forEach(currency => {
+                      rates[currency] = data.rates[currency];
+                  });
+            await populateCurrencyOptions();
+            await initializeRateChart();
+        } catch (error) {
+            console.error('Error fetching rates:', error);
+        }
+    }
 
     // Función para llenar las opciones de las monedas
-    function populateCurrencyOptions() {
-        const currencies = ['ARS', 'EUR', 'USD', 'JPY'];
-        currencies.forEach(currency => {
+    async function populateCurrencyOptions() {
+        const currencyOptions = Object.keys(rates);
+        currencyOptions.forEach(currency => {
             const option1 = document.createElement('option');
             option1.value = currency;
             option1.textContent = currency;
@@ -32,24 +45,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Función para mostrar las tasas de cambio
-    function showExchangeRates() {
-        let html = '<table>';
-        html += '<tr><th>Moneda</th><th>Tasa de cambio</th></tr>';
-        Object.keys(rates).forEach(currency => {
-            html += `<tr><td>${currency}</td><td>${rates[currency].toFixed(2)}</td></tr>`;
-        });
-        html += '</table>';
-        exchangeRates.innerHTML = html;
-    }
-
     // Función para convertir la moneda
     function convertCurrency() {
         const from = fromCurrency.value;
         const to = toCurrency.value;
         const amountValue = parseFloat(amount.value);
 
-        if (isNaN(amountValue) ||!from ||!to) {
+        if (isNaN(amountValue) || !from || !to) {
             conversionResult.textContent = 'Por favor, ingrese una cantidad válida y seleccione las monedas.';
             return;
         }
@@ -59,8 +61,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         conversionResult.textContent = `Resultado: ${result.toFixed(2)} ${to}`;
     }
 
-    populateCurrencyOptions();
-    showExchangeRates();
+    // Función para inicializar el gráfico de tasas de cambio
+    async function initializeRateChart() {
+        chart = new Chart(rateChart, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(rates),
+                datasets: [{
+                    label: 'Tasas de Cambio',
+                    data: Object.values(rates),
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
 
     convertButton.addEventListener('click', convertCurrency);
+
+    // Cargar las tasas de cambio al cargar la página
+    await fetchRates();
 });
