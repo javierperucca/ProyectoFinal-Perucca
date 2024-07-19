@@ -2,16 +2,7 @@
 <html>
 <head>
     <title>Conversor de Moneda</title>
-    <style>
-        table {
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <h1>Conversor de Moneda</h1>
@@ -25,7 +16,9 @@
         <button id="convertButton">Convertir</button>
         <p id="conversionResult"></p>
     </form>
-    <div id="exchangeRates"></div>
+    <div>
+        <canvas id="exchangeRatesChart"></canvas>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
@@ -34,7 +27,7 @@
             const amount = document.getElementById('amount');
             const convertButton = document.getElementById('convertButton');
             const conversionResult = document.getElementById('conversionResult');
-            const exchangeRates = document.getElementById('exchangeRates');
+            const exchangeRatesChart = document.getElementById('exchangeRatesChart');
 
             let rates = {
                 "ARS": 0.018,
@@ -64,13 +57,37 @@
 
             // Función para mostrar las tasas de cambio
             function showExchangeRates() {
-                let html = '<table>';
-                html += '<tr><th>Moneda</th><th>Tasa de cambio</th></tr>';
-                Object.keys(rates).forEach(currency => {
-                    html += `<tr><td>${currency}</td><td>${rates[currency].toFixed(2)}</td></tr>`;
+                const ctx = exchangeRatesChart.getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(rates),
+                        datasets: [{
+                            label: 'Tasas de cambio',
+                            data: Object.values(rates),
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.2)',
+                                'rgba(54, 162, 235, 0.2)',
+                                'rgba(255, 206, 86, 0.2)',
+                                'rgba(75, 192, 192, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
                 });
-                html += '</table>';
-                exchangeRates.innerHTML = html;
             }
 
             // Función para convertir la moneda
@@ -97,4 +114,3 @@
     </script>
 </body>
 </html>
-
