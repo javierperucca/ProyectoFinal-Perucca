@@ -1,25 +1,100 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Conversión de Monedas</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <title>Conversor de Moneda</title>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
 </head>
 <body>
-    <h1>Simulador de Conversión de Monedas</h1>
-    <div class="converter">
-        <h2>Conversión de Monedas</h2>
+    <h1>Conversor de Moneda</h1>
+    <form>
+        <label for="fromCurrency">De:</label>
         <select id="fromCurrency"></select>
-        <input type="number" id="amount" placeholder="Cantidad" />
+        <label for="toCurrency">A:</label>
         <select id="toCurrency"></select>
+        <label for="amount">Cantidad:</label>
+        <input type="number" id="amount" value="1">
         <button id="convertButton">Convertir</button>
-        <div id="conversionResult"></div>
-        <canvas id="rateChart" width="400" height="200"></canvas>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="main.js"></script>
+        <p id="conversionResult"></p>
+    </form>
+    <div id="exchangeRates"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const fromCurrency = document.getElementById('fromCurrency');
+            const toCurrency = document.getElementById('toCurrency');
+            const amount = document.getElementById('amount');
+            const convertButton = document.getElementById('convertButton');
+            const conversionResult = document.getElementById('conversionResult');
+            const exchangeRates = document.getElementById('exchangeRates');
+
+            let rates = {
+                "ARS": 0.018,
+                "EUR": 0.85,
+                "USD": 1.0,
+                "JPY": 110.0
+            };
+
+            // Limpiar opciones de moneda
+            fromCurrency.innerHTML = '';
+            toCurrency.innerHTML = '';
+
+            // Función para llenar las opciones de las monedas
+            function populateCurrencyOptions() {
+                const currencies = ['ARS', 'EUR', 'USD', 'JPY'];
+                currencies.forEach(currency => {
+                    const option1 = document.createElement('option');
+                    option1.value = currency;
+                    option1.textContent = currency;
+
+                    const option2 = option1.cloneNode(true);
+
+                    fromCurrency.appendChild(option1);
+                    toCurrency.appendChild(option2);
+                });
+            }
+
+            // Función para mostrar las tasas de cambio
+            function showExchangeRates() {
+                let html = '<table>';
+                html += '<tr><th>Moneda</th><th>Tasa de cambio</th></tr>';
+                Object.keys(rates).forEach(currency => {
+                    html += `<tr><td>${currency}</td><td>${rates[currency].toFixed(2)}</td></tr>`;
+                });
+                html += '</table>';
+                exchangeRates.innerHTML = html;
+            }
+
+            // Función para convertir la moneda
+            function convertCurrency() {
+                const from = fromCurrency.value;
+                const to = toCurrency.value;
+                const amountValue = parseFloat(amount.value);
+
+                if (isNaN(amountValue) || !from || !to) {
+                    conversionResult.textContent = 'Por favor, ingrese una cantidad válida y seleccione las monedas.';
+                    return;
+                }
+
+                const usdAmount = amountValue / rates[from];
+                const result = usdAmount * rates[to];
+                conversionResult.textContent = `Resultado: ${result.toFixed(2)} ${to}`;
+            }
+
+            populateCurrencyOptions();
+            showExchangeRates();
+
+            convertButton.addEventListener('click', convertCurrency);
+        });
+    </script>
 </body>
 </html>
-
 
