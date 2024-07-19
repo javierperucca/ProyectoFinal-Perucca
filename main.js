@@ -4,28 +4,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     const amount = document.getElementById('amount');
     const convertButton = document.getElementById('convertButton');
     const conversionResult = document.getElementById('conversionResult');
-    const rateChart = document.getElementById('rateChart').getContext('2d');
 
-    let rates = {};
-    let chart;
-
-    // Función para obtener tasas de cambio desde un JSON local o una API externa
-    async function fetchRates() {
-        try {
-            const response = await fetch('rates.json');
-            const data = await response.json();
-            rates = data.rates;
-            await populateCurrencyOptions();
-            await initializeRateChart();
-        } catch (error) {
-            console.error('Error fetching rates:', error);
-        }
-    }
+    let rates = {
+        "ARS": 0.018,
+        "EUR": 0.85,
+        "USD": 1.0,
+        "JPY": 110.0
+    };
 
     // Función para llenar las opciones de las monedas
-    async function populateCurrencyOptions() {
-        const currencyOptions = Object.keys(rates);
-        currencyOptions.forEach(currency => {
+    function populateCurrencyOptions() {
+        const currencies = ['ARS', 'EUR', 'USD', 'JPY'];
+        currencies.forEach(currency => {
             const option1 = document.createElement('option');
             option1.value = currency;
             option1.textContent = currency;
@@ -43,13 +33,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const to = toCurrency.value;
         const amountValue = parseFloat(amount.value);
 
-        if (isNaN(amountValue) ||!from ||!to) {
+        if (isNaN(amountValue) || !from || !to) {
             conversionResult.textContent = 'Por favor, ingrese una cantidad válida y seleccione las monedas.';
-            return;
-        }
-
-        if (!['ARS', 'EUR', 'USD', 'JPY'].includes(from) ||!['ARS', 'EUR', 'USD', 'JPY'].includes(to)) {
-            conversionResult.textContent = 'Solo se permiten conversiones entre ARS, EUR, USD y JPY.';
             return;
         }
 
@@ -58,32 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         conversionResult.textContent = `Resultado: ${result.toFixed(2)} ${to}`;
     }
 
-    // Función para inicializar el gráfico de tasas de cambio
-    async function initializeRateChart() {
-        chart = new Chart(rateChart, {
-            type: 'bar',
-            data: {
-                labels: Object.keys(rates),
-                datasets: [{
-                    label: 'Tasas de Cambio',
-                    data: Object.values(rates),
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    }
+    populateCurrencyOptions();
 
     convertButton.addEventListener('click', convertCurrency);
-
-    // Cargar las tasas de cambio al cargar la página
-    await fetchRates();
 });
