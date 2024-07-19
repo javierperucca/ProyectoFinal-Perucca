@@ -1,0 +1,33 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 20px;
+}
+
+.converter {
+    margin: 20px 0;
+}
+
+.converter select, .converter input {
+    padding: 10px;
+    font-size: 16px;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#conversionResult {
+    margin: 20px 0;
+}
+
+canvas {
+    margin: 20px 0;
+}
+
+.error {
+    color: red;
+}
+
