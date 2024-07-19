@@ -9,20 +9,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     let rates = {};
     let chart;
 
-    // Tasas de cambio solo para USD, EUR, JPY
-    const allowedCurrencies = ['USD', 'EUR', 'JPY'];
-
     // Función para obtener tasas de cambio desde un JSON local o una API externa
     async function fetchRates() {
         try {
             const response = await fetch('rates.json');
             const data = await response.json();
-            // Filtrar solo las tasas permitidas
-            Object.keys(data.rates)
-                  .filter(currency => allowedCurrencies.includes(currency))
-                  .forEach(currency => {
-                      rates[currency] = data.rates[currency];
-                  });
+            rates = data.rates;
             await populateCurrencyOptions();
             await initializeRateChart();
         } catch (error) {
@@ -51,7 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const to = toCurrency.value;
         const amountValue = parseFloat(amount.value);
 
-        if (isNaN(amountValue) || !from || !to) {
+        if (isNaN(amountValue) ||!from ||!to) {
             conversionResult.textContent = 'Por favor, ingrese una cantidad válida y seleccione las monedas.';
             return;
         }
@@ -85,6 +77,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    convertButton.addEventListener('click', convertCurrency);
+
+    // Cargar las tasas de cambio al cargar la página
+    await fetchRates();
+});
     convertButton.addEventListener('click', convertCurrency);
 
     // Cargar las tasas de cambio al cargar la página
