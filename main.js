@@ -12,6 +12,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         "JPY": 110.0
     };
 
+    // Limpiar opciones de moneda
+    fromCurrency.innerHTML = '';
+    toCurrency.innerHTML = '';
+
     // Función para llenar las opciones de las monedas
     function populateCurrencyOptions() {
         const currencies = ['ARS', 'EUR', 'USD', 'JPY'];
